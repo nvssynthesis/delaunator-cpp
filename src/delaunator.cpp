@@ -163,8 +163,8 @@ struct DelaunatorPoint {
 	bool removed;
 };
 
-Delaunator::Delaunator(std::vector<double> const& in_coords)
-    : coords(in_coords),
+Delaunator::Delaunator(std::vector<double>  in_coords)
+    : coords { std::move(in_coords) },
       triangles(),
       halfedges(),
       hull_prev(),

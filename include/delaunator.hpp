@@ -14,7 +14,7 @@ namespace delaunator {
 class Delaunator {
 
 public:
-    std::vector<double> const& coords;
+    std::vector<double> const coords;
     std::vector<std::size_t> triangles;
     std::vector<std::size_t> halfedges;
     std::vector<std::size_t> hull_prev;
@@ -22,7 +22,7 @@ public:
     std::vector<std::size_t> hull_tri;
     std::size_t hull_start;
 
-    Delaunator(std::vector<double> const& in_coords);
+    Delaunator(std::vector<double> in_coords);
 
     double get_hull_area();
 
