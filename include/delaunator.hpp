@@ -22,7 +22,7 @@ public:
     std::vector<std::size_t> hull_tri;
     std::size_t hull_start;
 
-    Delaunator(std::vector<double> in_coords);
+    explicit Delaunator(std::vector<double> in_coords);
 
     double get_hull_area();
 
