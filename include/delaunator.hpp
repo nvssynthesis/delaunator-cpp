@@ -1,12 +1,6 @@
 #pragma once
 
-#include <algorithm>
-#include <cmath>
-#include <exception>
-#include <iostream>
 #include <limits>
-#include <memory>
-#include <utility>
 #include <vector>
 
 namespace delaunator {
@@ -44,5 +38,7 @@ private:
         std::size_t c);
     void link(std::size_t a, std::size_t b);
 };
+
+constexpr std::size_t INVALID_INDEX = std::numeric_limits<std::size_t>::max();
 
 } //namespace delaunator

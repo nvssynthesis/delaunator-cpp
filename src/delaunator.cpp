@@ -1,6 +1,11 @@
-#pragma once
-
 #include "../include/delaunator.hpp"
+
+#include <cmath>
+#include <algorithm>
+#include <memory>
+#include <utility>
+#include <exception>
+#include <iostream>
 
 namespace delaunator {
 
@@ -140,7 +145,6 @@ inline bool in_circle(
 }
 
 constexpr double EPSILON = std::numeric_limits<double>::epsilon();
-constexpr std::size_t INVALID_INDEX = std::numeric_limits<std::size_t>::max();
 
 inline bool check_pts_equal(double x1, double y1, double x2, double y2) {
 	return std::fabs(x1 - x2) <= EPSILON &&
