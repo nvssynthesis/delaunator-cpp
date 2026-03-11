@@ -167,7 +167,7 @@ struct DelaunatorPoint {
 	bool removed;
 };
 
-Delaunator::Delaunator(std::vector<double>  in_coords)
+Delaunator::Delaunator(std::vector<double> in_coords)
     : coords { std::move(in_coords) },
       triangles(),
       halfedges(),
@@ -210,8 +210,9 @@ Delaunator::Delaunator(std::vector<double>  in_coords)
 
     // pick a seed point close to the centroid
     for (std::size_t i = 0; i < n; i++) {
-        const double d = dist(cx, cy, coords[2 * i], coords[2 * i + 1]);
-        if (d < min_dist) {
+        if (const double d = dist(cx, cy, coords[2 * i], coords[2 * i + 1]);
+            d < min_dist)
+        {
             i0 = i;
             min_dist = d;
         }
@@ -225,8 +226,9 @@ Delaunator::Delaunator(std::vector<double>  in_coords)
     // find the point closest to the seed
     for (std::size_t i = 0; i < n; i++) {
         if (i == i0) continue;
-        const double d = dist(i0x, i0y, coords[2 * i], coords[2 * i + 1]);
-        if (d < min_dist && d > 0.0) {
+        if (const double d = dist(i0x, i0y, coords[2 * i], coords[2 * i + 1]);
+            d < min_dist && d > 0.0)
+        {
             i1 = i;
             min_dist = d;
         }
@@ -388,9 +390,11 @@ Delaunator::Delaunator(std::vector<double>  in_coords)
         m_hash[hash_key(x, y)] = i;
         m_hash[hash_key(coords[2 * e], coords[2 * e + 1])] = e;
     }
+    compute_hull_neighbors();
+    compute_hull_search_candidates();
 }
 
-double Delaunator::get_hull_area() {
+double Delaunator::get_hull_area() const {
     std::vector<double> hull_area;
     size_t e = hull_start;
     do {
@@ -399,7 +403,41 @@ double Delaunator::get_hull_area() {
     } while (e != hull_start);
     return sum(hull_area);
 }
+void Delaunator::compute_hull_neighbors(const size_t degrees) {
+    hull_neighbor_triangles.clear();
 
+    // seed w/ hull triangles
+    for_each_hull_triangle([&](const size_t tri_idx, size_t) {
+        hull_neighbor_triangles.insert(tri_idx / 3);
+    });
+
+    // expand outward 'degrees' times
+    for (size_t d = 0; d < degrees; d++) {
+        std::vector frontier(hull_neighbor_triangles.begin(),
+                             hull_neighbor_triangles.end());
+        for (const size_t tri : frontier) {
+            for (size_t e = tri * 3; e < tri * 3 + 3; e++) {
+                if (const size_t opposite = halfedges[e];
+                    opposite != INVALID_INDEX)
+                {
+                    hull_neighbor_triangles.insert(opposite / 3);
+                }
+            }
+        }
+    }
+}
+
+void Delaunator::compute_hull_search_candidates() {
+    std::unordered_set<size_t> seen;
+    hull_search_candidates.reserve(hull_neighbor_triangles.size() * 3);
+
+    for (const size_t tri : hull_neighbor_triangles) {
+        for (size_t e = tri * 3; e < tri * 3 + 3; e++) {
+            if (const size_t pt = triangles[e]; seen.insert(pt).second)
+                hull_search_candidates.push_back(pt);
+        }
+    }
+}
 std::size_t Delaunator::legalize(std::size_t a) {
     std::size_t i = 0;
     std::size_t ar = 0;

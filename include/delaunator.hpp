@@ -2,8 +2,10 @@
 
 #include <limits>
 #include <vector>
+#include <unordered_set>
 
 namespace delaunator {
+constexpr std::size_t INVALID_INDEX = std::numeric_limits<std::size_t>::max();
 
 class Delaunator {
 
@@ -18,7 +20,22 @@ public:
 
     explicit Delaunator(std::vector<double> in_coords);
 
-    double get_hull_area();
+    double get_hull_area() const;
+
+    template<typename Callback>
+    void for_each_hull_triangle(Callback&& cb) const {
+        size_t e = hull_start;
+        do {
+            cb(hull_tri[e], e);  // triangle index, hull edge point
+            e = hull_next[e];
+        } while (e != hull_start);
+    }
+
+    std::unordered_set<size_t> hull_neighbor_triangles;
+    std::vector<size_t> hull_search_candidates;
+
+    void compute_hull_neighbors(size_t degrees=5);
+    void compute_hull_search_candidates();
 
 private:
     std::vector<std::size_t> m_hash;
@@ -38,7 +55,5 @@ private:
         std::size_t c);
     void link(std::size_t a, std::size_t b);
 };
-
-constexpr std::size_t INVALID_INDEX = std::numeric_limits<std::size_t>::max();
 
 } //namespace delaunator
